@@ -41,8 +41,10 @@ class MV:
 
     if router:
       # Buscar la etiqueta 'interface' y duplicarla
+      old_interface=root.find("./devices/interface")
       new_interface = etree.Element("interface")
-      new_interface.append(deepcopy(root[1]))
+      new_interface.append(deepcopy(old_interface))
+      root.find(".//devices").append(new_interface)
       # POR HACER...
     else:
       # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
