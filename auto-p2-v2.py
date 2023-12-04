@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from lib_mv import MV
+from lib_mv import Red
 import logging, sys
 
 def init_log():
@@ -20,13 +21,8 @@ def pause():
 init_log()
 print('CDPS - mensaje info1')
 
-# Ejemplo de creacion de una maquina virtual
+# Creación de las máquinas virtuales
 s1 = MV('s1')
 pause()
-s1.crear_mv('cdps-vm.qcow2', 'if1', False )
+s1.crear_mv('cdps-vm-base-pc1.qcow2', 'LAN2', False)
 pause()
-s1.arrancar_mv()
-pause()
-s1.parar_mv()
-pause()
-s1.liberar_mv()

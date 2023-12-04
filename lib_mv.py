@@ -21,34 +21,36 @@ class MV:
     subprocess.call(["cp", "plantilla-vm-pc1.xml", self.nombre + ".xml"], shell=True)
 
     # Cargamos el fichero xml
-    tree = etree.parse('plantilla-vm-pc1.xml')
+    tree = etree.parse(self.nombre + '.xml')
     # Lo imprimimos en pantalla
     print(etree.tounicode(tree, pretty_print=True))
-    # Obtenemos el nodo raiz e imprimimos su nombre y el valor del atributo 'tipo'
+    # Obtenemos el nodo raiz, buscamos la etiqueta 'name', imprimimos su valor y luego lo cambiamos
     root = tree.getroot()
-    print(root.tag)
-    print(root.get("tipo"))
-    # Buscamos la etiqueta 'name' imprimimos su valor y luego lo cambiamos
     name = root.find("name")
     print(name.text)
     name.text = self.nombre
     print(name.text)
     # Buscamos el nodo 'source' bajo 'disk' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
-    source_disk=root.find("./devices/disk/source")
+    source_disk = root.find("./devices/disk/source")
     print(source_disk.get("file"))
     source_disk.set("file", "/mnt/tmp/" + self.nombre + "/" + self.nombre + ".qcow2")
     print(source_disk.get("file"))
 
     if router:
       # Buscar la etiqueta 'interface' y duplicarla
-      old_interface=root.find("./devices/interface")
+      interface = root.find("./devices/interface")
       new_interface = etree.Element("interface")
-      new_interface.append(deepcopy(old_interface))
-      root.find(".//devices").append(new_interface)
-      # POR HACER...
+      new_interface.append(deepcopy(interface))
+      # Buscar el nodo 'source' bajo 'interface' y cambiar sus valores
+      source1 = interface.find("source")
+      source1.set("bridge", "LAN1")
+      source2 = new_interface.find("source")
+      source2.set("bridge", "LAN2")
+      # Copiar el nuevo interface dentro de la etiqueta 'devices'
+      root.find("./devices").append(new_interface)
     else:
       # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
-      source_interface=root.find("./devices/interface/source")
+      source_interface = root.find("./devices/interface/source")
       print(source_interface.get("bridge"))
       source_interface.set("bridge", interfaces_red)
       print(source_interface.get("bridge"))
