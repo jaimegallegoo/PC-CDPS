@@ -168,3 +168,4 @@ class Red:
 
   def liberar_red(self):
       log.debug('liberar_red ' + self.nombre)
+gfvgvtgv
