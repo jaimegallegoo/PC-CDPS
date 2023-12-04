@@ -61,7 +61,7 @@ class MV:
     # Arrancar cada máquina virtual
     subprocess.call(["sudo", "virsh", "define", self.nombre + ".xml"], shell=True)
     subprocess.call(["sudo", "virsh", "start", self.nombre], shell=True)
-    subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
+    # subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
 
     # Crear los ficheros de configuración de cada máquina virtual en el host en un directorio temporal
     if self.nombre == 's1':
@@ -145,6 +145,8 @@ class MV:
 
   def mostrar_consola_mv (self):
     log.debug("mostrar_mv " + self.nombre)
+    # Arrancar la consola de cada máquina virtual
+    subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
 
   def parar_mv (self):
     log.debug("parar_mv " + self.nombre)
