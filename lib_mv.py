@@ -18,23 +18,19 @@ class MV:
     subprocess.call(['qemu-img', 'create', '-f', 'qcow2', '-b', imagen, f'{self.nombre}.qcow2'])
 
     # Crear especificaciones en XML
-    subprocess.call(["cp", "plantilla-vm-pc1.xml", self.nombre + ".xml"], shell=True)
+    subprocess.call(['cp', 'plantilla-vm-pc1.xml', f'{self.nombre}.xml'])
 
     # Cargamos el fichero xml
     tree = etree.parse(self.nombre + '.xml')
     # Lo imprimimos en pantalla
     print(etree.tounicode(tree, pretty_print=True))
-    # Obtenemos el nodo raiz, buscamos la etiqueta 'name', imprimimos su valor y luego lo cambiamos
+    # Obtenemos el nodo raiz, buscamos la etiqueta 'name' y luego lo cambiamos
     root = tree.getroot()
     name = root.find("name")
-    print(name.text)
     name.text = self.nombre
-    print(name.text)
-    # Buscamos el nodo 'source' bajo 'disk' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
+    # Buscamos el nodo 'source' bajo 'disk' bajo 'devices' con nombre 'file' y lo cambiamos
     source_disk = root.find("./devices/disk/source")
-    print(source_disk.get("file"))
     source_disk.set("file", "/mnt/tmp/" + self.nombre + "/" + self.nombre + ".qcow2")
-    print(source_disk.get("file"))
 
     if router:
       # Buscar la etiqueta 'interface' y duplicarla
@@ -49,11 +45,9 @@ class MV:
       # Copiar el nuevo interface dentro de la etiqueta 'devices'
       root.find("./devices").append(new_interface)
     else:
-      # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
+      # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file' y lo cambiamos
       source_interface = root.find("./devices/interface/source")
-      print(source_interface.get("bridge"))
       source_interface.set("bridge", interfaces_red)
-      print(source_interface.get("bridge"))
 
     # Imprimimos el xml con todos los cambios realizados
     print(etree.tounicode(tree, pretty_print=True))
