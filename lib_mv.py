@@ -15,7 +15,7 @@ class MV:
   def crear_mv (self, imagen, interfaces_red, router):
     log.debug("crear_mv " + self.nombre)
     # Crear imágenes de diferencias
-    subprocess.call(["qemu-img", "create", "-f", "qcow2", "-b", imagen, self.nombre + ".qcow2"], shell=True)
+    subprocess.call(['qemu-img', 'create', '-f', 'qcow2', '-b', imagen, f'{self.nombre}.qcow2'])
 
     # Crear especificaciones en XML
     subprocess.call(["cp", "plantilla-vm-pc1.xml", self.nombre + ".xml"], shell=True)
