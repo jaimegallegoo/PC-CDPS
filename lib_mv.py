@@ -51,6 +51,8 @@ class MV:
 
     # Imprimimos el xml con todos los cambios realizados
     print(etree.tounicode(tree, pretty_print=True))
+    # Guardar los cambios realizados
+    tree.write(self.nombre + '.xml')
 
   def arrancar_mv (self):
     log.debug("arrancar_mv " + self.nombre)
