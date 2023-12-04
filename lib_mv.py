@@ -32,20 +32,21 @@ class MV:
     source_disk = root.find("./devices/disk/source")
     source_disk.set("file", "/mnt/tmp/" + self.nombre + "/" + self.nombre + ".qcow2")
 
+    # Modificar la etiqueta 'interface' dependiendo de si es el router o no
     if router:
       # Buscar la etiqueta 'interface' y duplicarla
-      interface = root.find("./devices/interface")
-      new_interface = etree.Element("interface")
-      new_interface.append(deepcopy(interface))
-      # Buscar el nodo 'source' bajo 'interface' y cambiar sus valores
-      source1 = interface.find("source")
+      existing_interface = root.find(".//interface")
+      # Modificar el valor del atributo 'source' en el primer nodo 'interface'
+      source1 = existing_interface.find(".//source")
       source1.set("bridge", "LAN1")
-      source2 = new_interface.find("source")
+      # Duplicar la etiqueta 'interface'
+      new_interface = deepcopy(existing_interface)
+      root.find(".//devices").append(new_interface)             
+      # Modificar el valor del atributo 'source' en el segundo nodo 'interface'
+      source2 = new_interface.find(".//source")
       source2.set("bridge", "LAN2")
-      # Copiar el nuevo interface dentro de la etiqueta 'devices'
-      root.find("./devices").append(new_interface)
     else:
-      # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file' y lo cambiamos
+      # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
       source_interface = root.find("./devices/interface/source")
       source_interface.set("bridge", interfaces_red)
 
