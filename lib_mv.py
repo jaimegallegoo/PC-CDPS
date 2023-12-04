@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# Prueba de commit
 import logging
 import subprocess
 import os
@@ -138,7 +137,7 @@ class MV:
     subprocess.call(["sudo", "virt-copy-in", "-a", self.nombre + ".qcow2", "interfaces", "/etc/network"], shell=True)
     subprocess.call(["sudo", "virt-copy-in", "-a", self.nombre + ".qcow2", "hostname", "/etc"], shell=True)
 
-    # Editar el archivo "host"
+    # Editar el archivo "hosts"
     subprocess.call(["sudo", "virt-edit", "-a", self.nombre + ".qcow2", "/etc/hosts", "-e", "'s/127.0.1.1.*/127.0.1.1 " + self.nombre + "/'"], shell=True)
 
     # Configurar el balanceador de tráfico para que funcione como router al arrancar
@@ -168,4 +167,3 @@ class Red:
 
   def liberar_red(self):
       log.debug('liberar_red ' + self.nombre)
-gfvgvtgv
