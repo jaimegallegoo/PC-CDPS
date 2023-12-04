@@ -145,11 +145,13 @@ class MV:
 
   def mostrar_consola_mv (self):
     log.debug("mostrar_mv " + self.nombre)
-    # Arrancar la consola de cada máquina virtual
+    # Arrancar la consola de la máquina virtual
     subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
 
   def parar_mv (self):
     log.debug("parar_mv " + self.nombre)
+     # Detener la máquina virtual
+    subprocess.call(["virsh", "shutdown", self.nombre], shell=True)
 
   def liberar_mv (self):
     log.debug("liberar_mv " + self.nombre)
