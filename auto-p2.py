@@ -15,10 +15,6 @@ def pause():
     programPause = input("Press the <ENTER> key to continue...")
 
 def main():
-    if len(sys.argv) != 2:
-        print("Uso: python script.py <orden>")
-        return
-
     orden = sys.argv[1]
 
     # Crear las clases MV
@@ -41,22 +37,34 @@ def main():
         lb.crear_mv("cdps-vm-base-pc1.qcow2", "null", True)
 
     elif orden == "arrancar":
-        # Realizar operaciones relacionadas con el arranque de máquinas virtuales
-        s1.arrancar_mv()
-        s2.arrancar_mv()
-        s3.arrancar_mv()
-        c1.arrancar_mv()
-        host.arrancar_mv()
-        lb.arrancar_mv()
+        if len(sys.argv) < 3:
+            # Realizar operaciones relacionadas con el arranque de máquinas virtuales
+            s1.arrancar_mv()
+            s2.arrancar_mv()
+            s3.arrancar_mv()
+            c1.arrancar_mv()
+            host.arrancar_mv()
+            lb.arrancar_mv()
+            return
+        else:
+            nombre_mv = sys.argv[2]
+            mv = MV(nombre_mv)
+            mv.arrancar_mv()
 
     elif orden == "parar":
-        # Realizar operaciones relacionadas con el paro de máquinas virtuales
-        s1.parar_mv()
-        s2.parar_mv()
-        s3.parar_mv()
-        c1.parar_mv()
-        host.parar_mv()
-        lb.parar_mv()
+        if len(sys.argv) < 3:
+            # Realizar operaciones relacionadas con el paro de máquinas virtuales
+            s1.parar_mv()
+            s2.parar_mv()
+            s3.parar_mv()
+            c1.parar_mv()
+            host.parar_mv()
+            lb.parar_mv()
+            return
+        else:
+            nombre_mv = sys.argv[2]
+            mv = MV(nombre_mv)
+            mv.parar_mv()
 
     elif orden == "liberar":
         # Realizar operaciones relacionadas con la liberación de recursos
@@ -67,7 +75,7 @@ def main():
         host.liberar_mv()
         lb.liberar_mv()
         red.liberar_red()
-
+        
     else:
         print(f"Orden no reconocida: {orden}")
 
