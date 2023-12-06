@@ -1,4 +1,4 @@
-import logging, sys
+import logging, sys, subprocess
 from lib_mv import MV, Red
 
 def init_log():
@@ -75,6 +75,10 @@ def main():
         host.liberar_mv()
         lb.liberar_mv()
         red.liberar_red()
+
+    elif orden == "monitor":
+        # Monitorizar el estado de las máquinas virtuales
+        subprocess.call(['sudo', 'virsh', 'list', '--all'])
         
     else:
         print(f"Orden no reconocida: {orden}")
