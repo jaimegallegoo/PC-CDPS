@@ -195,3 +195,5 @@ class Red:
 
   def liberar_red(self):
       log.debug('liberar_red ' + self.nombre)
+      subprocess.call(['sudo', 'brctl', 'delbr', 'LAN1'])
+      subprocess.call(['sudo', 'brctl', 'delbr', 'LAN2'])
