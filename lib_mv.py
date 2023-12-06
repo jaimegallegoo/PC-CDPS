@@ -24,8 +24,6 @@ class MV:
 
     # Cargamos el fichero xml
     tree = etree.parse(self.nombre + '.xml')
-    # Lo imprimimos en pantalla
-    print(etree.tounicode(tree, pretty_print=True))
     # Obtenemos el nodo raiz, buscamos la etiqueta 'name' y luego lo cambiamos
     root = tree.getroot()
     name = root.find("name")
@@ -51,10 +49,7 @@ class MV:
       # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
       source_interface = root.find("./devices/interface/source")
       source_interface.set("bridge", interfaces_red)
-
-    # Imprimimos el xml con todos los cambios realizados
-    print(etree.tounicode(tree, pretty_print=True))
-    # Guardar los cambios realizados
+      # Guardar los cambios realizados
     tree.write(self.nombre + '.xml')
 
   def arrancar_mv (self):
