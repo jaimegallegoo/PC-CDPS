@@ -4,12 +4,14 @@ import subprocess
 import os
 from lxml import etree
 from copy import deepcopy
+import getpass
 
 log = logging.getLogger('auto_p2')
     
 class MV:
   def __init__(self, nombre):
     self.nombre = nombre
+    self.usuario = getpass.getuser()
     log.debug('init MV ' + self.nombre)
 
   def crear_mv (self, imagen, interfaces_red, router):
@@ -30,7 +32,7 @@ class MV:
     name.text = self.nombre
     # Buscamos el nodo 'source' bajo 'disk' bajo 'devices' con nombre 'file' y lo cambiamos
     source_disk = root.find("./devices/disk/source")
-    source_disk.set("file", "/mnt/tmp/" + self.nombre + "/" + self.nombre + ".qcow2")
+    source_disk.set("file", "/mnt/tmp/" + self.usuario + "/" + self.nombre + ".qcow2")
 
     # Modificar la etiqueta 'interface' dependiendo de si es el router o no
     if router:
