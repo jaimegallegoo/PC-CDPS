@@ -144,7 +144,7 @@ class MV:
     subprocess.call(['sudo', 'virt-edit', '-a', f'{self.nombre}.qcow2', '/etc/hosts', '-e', '"s/127.0.1.1.*/127.0.1.1', f'{self.nombre}/"'])
 
     # Configurar el balanceador de tráfico para que funcione como router al arrancar
-    subprocess.call(['sudo', 'virt-edit', '-a', 'lb.qcow2', '/etc/sysctl.conf', '\-e', '"s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"'])
+    subprocess.call(['sudo', 'virt-edit', '-a', 'lb.qcow2', '/etc/sysctl.conf', '-e', '"s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"'])
 
   def mostrar_consola_mv (self):
     log.debug("mostrar_mv " + self.nombre)
