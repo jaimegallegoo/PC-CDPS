@@ -26,3 +26,12 @@ s1 = MV('s1')
 pause()
 s1.crear_mv('cdps-vm-base-pc1.qcow2', 'LAN2', False)
 pause()
+
+# Creación de la red
+red = Red('red')
+pause()
+red.crear_red()
+pause()
+
+# Arrancar las máquinas virtuales
+s1.arrancar_mv()
