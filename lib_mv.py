@@ -59,13 +59,6 @@ class MV:
 
   def arrancar_mv (self):
     log.debug("arrancar_mv " + self.nombre)
-    # Arrancar el gestor de máquinas virtuales para monitorizar su arranque
-    subprocess.call(['HOME=/mnt/tmp', 'sudo', 'virt-manager'])  
-    # Arrancar cada máquina virtual
-    subprocess.call(['sudo', 'virsh', 'define', f'{self.nombre}.xml'])
-    subprocess.call(['sudo', 'virsh', 'start', f'{self.nombre}'])
-    # subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
-
     # Crear los ficheros de configuración de cada máquina virtual en el host en un directorio temporal
     if self.nombre == 's1':
       contenido = """
@@ -132,9 +125,11 @@ class MV:
     with open(ruta_interfaces, 'w') as interfaces:
       interfaces.write(contenido)
 
-    # Editar el archivo "hostname" HAY QUE CAMBIARLO
-    # subprocess.call(['sudo bash -c "echo ' + f'{self.nombre}' + ' > hostname"'])
-    subprocess.call(['sudo', 'bash', '-c', '"echo', f'{self.nombre}', '>', 'hostname"'])
+    # Ruta completa al archivo "hostname"
+    ruta_hostname = os.path.join(directorio_trabajo, "hostname")
+    # Escribir el contenido sobre el archivo "hostname"
+    with open(ruta_hostname, 'w') as hostname:
+      hostname.write(f'{self.nombre}')
 
     # Copiar los ficheros de configuración a las máquinas virtuales
     subprocess.call(['sudo', 'virt-copy-in', '-a', f'{self.nombre}.qcow2', 'interfaces', '/etc/network'])
@@ -144,12 +139,22 @@ class MV:
     subprocess.call(['sudo', 'virt-edit', '-a', f'{self.nombre}.qcow2', '/etc/hosts', '-e', '"s/127.0.1.1.*/127.0.1.1', f'{self.nombre}/"'])
 
     # Configurar el balanceador de tráfico para que funcione como router al arrancar
-    subprocess.call(['sudo', 'virt-edit', '-a', 'lb.qcow2', '/etc/sysctl.conf', '-e', '"s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"'])
+    if self.nombre == 'lb':
+      subprocess.call(['sudo', 'virt-edit', '-a', 'lb.qcow2', '/etc/sysctl.conf', '-e', '"s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"'])
+    
+    # Arrancar el gestor de máquinas virtuales para monitorizar su arranque
+    os.environ['HOME']='/mnt/tmp'
+    subprocess.call(['sudo', 'virt-manager'])
+    # Arrancar cada máquina virtual
+    subprocess.call(['sudo', 'virsh', 'define', f'{self.nombre}.xml'])
+    subprocess.call(['sudo', 'virsh', 'start', f'{self.nombre}'])
+
+    log.debug("Se ha arrancado la máquina virtual")
 
   def mostrar_consola_mv (self):
     log.debug("mostrar_mv " + self.nombre)
     # Arrancar la consola de la máquina virtual
-    subprocess.call(['xterm', '-e', 'sudo', 'virsh', 'console', f'{self.nombre}', '&'])
+    subprocess.call(['xterm', '-e', 'sudo', 'virsh', 'console', self.nombre])
 
   def parar_mv (self):
     log.debug("parar_mv " + self.nombre)
