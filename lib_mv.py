@@ -58,10 +58,10 @@ class MV:
   def arrancar_mv (self):
     log.debug("arrancar_mv " + self.nombre)
     # Arrancar el gestor de máquinas virtuales para monitorizar su arranque
-    subprocess.call(["HOME=/mnt/tmp", "sudo", "virt-manager"], shell=True)  
+    subprocess.call(['HOME=/mnt/tmp', 'sudo', 'virt-manager'])  
     # Arrancar cada máquina virtual
-    subprocess.call(["sudo", "virsh", "define", self.nombre + ".xml"], shell=True)
-    subprocess.call(["sudo", "virsh", "start", self.nombre], shell=True)
+    subprocess.call(['sudo', 'virsh', 'define', f'{self.nombre}.xml'])
+    subprocess.call(['sudo', 'virsh', 'start', f'{self.nombre}'])
     # subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
 
     # Crear los ficheros de configuración de cada máquina virtual en el host en un directorio temporal
