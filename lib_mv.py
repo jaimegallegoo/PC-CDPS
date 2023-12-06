@@ -49,7 +49,8 @@ class MV:
       # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
       source_interface = root.find("./devices/interface/source")
       source_interface.set("bridge", interfaces_red)
-      # Guardar los cambios realizados
+
+    # Guardar los cambios realizados
     tree.write(self.nombre + '.xml')
 
   def arrancar_mv (self):
@@ -174,7 +175,7 @@ class MV:
     log.debug("liberar_mv " + self.nombre)
     # Liberar y borrar la máquina virtual
     subprocess.call(['sudo', 'virsh', 'destroy', f'{self.nombre}'])
-    subprocess.call(['rm', '-f', f'{self.nombre}.xml', f'{self.nombre}.qcow2', 'interfaces', 'hostname'])
+    subprocess.call(['rm', '-f', f'{self.nombre}.qcow2', f'{self.nombre}.xml', 'interfaces', 'hostname'])
 
 class Red:
   def __init__(self, nombre):
@@ -192,5 +193,7 @@ class Red:
   def liberar_red(self):
       log.debug('liberar_red ' + self.nombre)
       # Eliminar los bridges correspondientes a las dos redes virtuales
+      subprocess.call(['sudo', 'ifconfig', 'LAN1', 'down'])
+      subprocess.call(['sudo', 'ifconfig', 'LAN2', 'down'])
       subprocess.call(['sudo', 'brctl', 'delbr', 'LAN1'])
       subprocess.call(['sudo', 'brctl', 'delbr', 'LAN2'])
