@@ -195,5 +195,6 @@ class Red:
 
   def liberar_red(self):
       log.debug('liberar_red ' + self.nombre)
+      # Eliminar los bridges correspondientes a las dos redes virtuales
       subprocess.call(['sudo', 'brctl', 'delbr', 'LAN1'])
       subprocess.call(['sudo', 'brctl', 'delbr', 'LAN2'])
