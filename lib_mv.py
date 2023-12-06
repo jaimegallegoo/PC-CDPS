@@ -159,12 +159,12 @@ class MV:
   def parar_mv (self):
     log.debug("parar_mv " + self.nombre)
     # Detener la máquina virtual
-    subprocess.call(['virsh', 'shutdown', f'{self.nombre}'])
+    subprocess.call(['sudo', 'virsh', 'shutdown', f'{self.nombre}'])
 
   def liberar_mv (self):
     log.debug("liberar_mv " + self.nombre)
     # Liberar y borrar la máquina virtual
-    subprocess.call(['virsh', 'destroy', f'{self.nombre}'])
+    subprocess.call(['sudo', 'virsh', 'destroy', f'{self.nombre}'])
 
 class Red:
   def __init__(self, nombre):
