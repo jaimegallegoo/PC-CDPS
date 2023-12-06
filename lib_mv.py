@@ -130,34 +130,34 @@ class MV:
     with open(ruta_interfaces, 'w') as interfaces:
       interfaces.write(contenido)
 
-    # Editar el archivo "hostname"
-    subprocess.call(['sudo bash -c "echo ' + self.nombre + ' > hostname"'], shell=True)
-    subprocess.call(["sudo", "bash", "-c", "'echo " + self.nombre + " > hostname'"], shell=True)
+    # Editar el archivo "hostname" HAY QUE CAMBIARLO
+    # subprocess.call(['sudo bash -c "echo ' + f'{self.nombre}' + ' > hostname"'])
+    subprocess.call(['sudo', 'bash', '-c', '"echo', f'{self.nombre}', '>', 'hostname"'])
 
     # Copiar los ficheros de configuración a las máquinas virtuales
-    subprocess.call(["sudo", "virt-copy-in", "-a", self.nombre + ".qcow2", "interfaces", "/etc/network"], shell=True)
-    subprocess.call(["sudo", "virt-copy-in", "-a", self.nombre + ".qcow2", "hostname", "/etc"], shell=True)
+    subprocess.call(['sudo', 'virt-copy-in', '-a', f'{self.nombre}.qcow2', 'interfaces', '/etc/network'])
+    subprocess.call(['sudo', 'virt-copy-in', '-a', f'{self.nombre}.qcow2', 'hostname', '/etc'])
 
     # Editar el archivo "hosts"
-    subprocess.call(["sudo", "virt-edit", "-a", self.nombre + ".qcow2", "/etc/hosts", "-e", "'s/127.0.1.1.*/127.0.1.1 " + self.nombre + "/'"], shell=True)
+    subprocess.call(['sudo', 'virt-edit', '-a', f'{self.nombre}.qcow2', '/etc/hosts', '-e', '"s/127.0.1.1.*/127.0.1.1', f'{self.nombre}/"'])
 
     # Configurar el balanceador de tráfico para que funcione como router al arrancar
-    subprocess.call(["sudo", "virt-edit", "-a", "lb.qcow2", "/etc/sysctl.conf", "\-e", "'s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/'"], shell=True)
+    subprocess.call(['sudo', 'virt-edit', '-a', 'lb.qcow2', '/etc/sysctl.conf', '\-e', '"s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"'])
 
   def mostrar_consola_mv (self):
     log.debug("mostrar_mv " + self.nombre)
     # Arrancar la consola de la máquina virtual
-    subprocess.call(["xterm", "-e", "sudo", "virsh", "console", self.nombre, "&"], shell=True)
+    subprocess.call(['xterm', '-e', 'sudo', 'virsh', 'console', f'{self.nombre}', '&'])
 
   def parar_mv (self):
     log.debug("parar_mv " + self.nombre)
     # Detener la máquina virtual
-    subprocess.call(["virsh", "shutdown", self.nombre], shell=True)
+    subprocess.call(['virsh', 'shutdown', f'{self.nombre}'])
 
   def liberar_mv (self):
     log.debug("liberar_mv " + self.nombre)
     # Liberar y borrar la máquina virtual
-    subprocess.call(["virsh", "destroy", self.nombre], shell=True)
+    subprocess.call(['virsh', 'destroy', f'{self.nombre}'])
 
 class Red:
   def __init__(self, nombre):
@@ -167,10 +167,10 @@ class Red:
   def crear_red(self):
       log.debug('crear_red ' + self.nombre)
       # Crear los bridges correspondientes a las dos redes virtuales
-      subprocess.call(["sudo", "brctl", "addbr", "LAN1"], shell=True)
-      subprocess.call(["sudo", "brctl", "addbr", "LAN2"], shell=True)
-      subprocess.call(["sudo", "ifconfig", "LAN1", "up"], shell=True)
-      subprocess.call(["sudo", "ifconfig", "LAN2", "up"], shell=True)
+      subprocess.call(['sudo', 'brctl', 'addbr', 'LAN1'])
+      subprocess.call(['sudo', 'brctl', 'addbr', 'LAN2'])
+      subprocess.call(['sudo', 'ifconfig', 'LAN1', 'up'])
+      subprocess.call(['sudo', 'ifconfig', 'LAN2', 'up'])
 
   def liberar_red(self):
       log.debug('liberar_red ' + self.nombre)
