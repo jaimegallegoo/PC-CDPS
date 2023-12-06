@@ -174,6 +174,7 @@ class MV:
     log.debug("liberar_mv " + self.nombre)
     # Liberar y borrar la máquina virtual
     subprocess.call(['sudo', 'virsh', 'destroy', f'{self.nombre}'])
+    subprocess.call(['rm', '-f', f'{self.nombre}.xml', f'{self.nombre}.qcow2', 'interfaces', 'hostname'])
 
 class Red:
   def __init__(self, nombre):
