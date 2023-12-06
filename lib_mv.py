@@ -49,9 +49,8 @@ class MV:
       # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
       source_interface = root.find("./devices/interface/source")
       source_interface.set("bridge", interfaces_red)
-
-    # Guardar los cambios realizados
-    tree.write(self.nombre + '.xml')
+      # Guardar los cambios realizados
+      tree.write(self.nombre + '.xml')
 
   def arrancar_mv (self):
     log.debug("arrancar_mv " + self.nombre)
