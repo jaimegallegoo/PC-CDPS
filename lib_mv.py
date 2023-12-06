@@ -98,7 +98,7 @@ class MV:
         auto lo
         iface lo inet loopback
         
-        auto eth0
+        auto eth1
           iface eth0 inet static
           address 10.11.1.2
           netmask 255.255.255.0
@@ -109,13 +109,27 @@ class MV:
         auto lo
         iface lo inet loopback
         
-        auto eth0
+        auto eth1
           iface eth0 inet static
           address 10.11.1.3
           netmask 255.255.255.0
           gateway 10.11.1.1
       """
-    # HAY QUE PONER INTERFACES PARA EL ROUTER TAMBIÉN???
+    elif self.nombre == 'lb':
+      contenido = """
+        auto lo
+        iface lo inet loopback
+        
+        auto eth0
+          iface eth0 inet static
+          address 10.11.1.1
+          netmask 255.255.255.0
+        
+        auto eth1
+          iface eth0 inet static
+          address 10.11.2.1
+          netmask 255.255.255.0
+      """
      
     # Directorio de trabajo actual
     directorio_trabajo = os.getcwd()
