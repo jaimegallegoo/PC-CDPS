@@ -1,4 +1,4 @@
-import logging, sys, subprocess
+import logging, sys, subprocess, json
 from lib_mv import MV, Red
 
 def init_log():
@@ -14,49 +14,71 @@ def init_log():
 def pause():
     programPause = input("Press the <ENTER> key to continue...")
 
-def main():
-    orden = sys.argv[1]
+def load_configuration():
+    # Cargar la configuración desde el archivo JSON
+    try:
+        with open('auto-p2.json') as config_file:
+            config_data = json.load(config_file)
+            return config_data["num_serv"]
+    except FileNotFoundError:
+        print("Archivo 'auto-p2.json' no encontrado. Asegúrate de que el archivo exista y tenga el formato correcto.")
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print("Error al decodificar el archivo 'auto-p2.json'. Asegúrate de que el formato JSON sea correcto.")
+        sys.exit(1)
 
-    # Crear las clases MV
-    s1 = MV("s1")
-    s2 = MV("s2")
-    s3 = MV("s3")
+def main():
+    num_servidores = load_configuration()
+        
+    # Crear las clases de las MV
     c1 = MV("c1")
     host = MV("host")
     lb = MV("lb")
     red = Red("red")
 
+    # Establecer la posición de la orden en la línea de argumentos
+    orden = sys.argv[1]
+
     if orden == "crear":
-        # Realizar operaciones relacionadas con la creación de máquinas virtuales y redes
+        # Crear la red
         red.crear_red()
-        s1.crear_mv("cdps-vm-base-pc1.qcow2", "LAN2", False)
-        s2.crear_mv("cdps-vm-base-pc1.qcow2", "LAN2", False)
-        s3.crear_mv("cdps-vm-base-pc1.qcow2", "LAN2", False)
+        # Crear los servidores
+        for i in range(num_servidores):
+            s = MV(f's{i + 1}')
+            s.crear_mv("cdps-vm-base-pc1.qcow2", "LAN2", False)
+        # Crear el resto de máquinas virtuales
         c1.crear_mv("cdps-vm-base-pc1.qcow2", "LAN1", False)
         host.crear_mv("cdps-vm-base-pc1.qcow2", "LAN1", False)
         lb.crear_mv("cdps-vm-base-pc1.qcow2", "null", True)
 
     elif orden == "arrancar":
         if len(sys.argv) < 3:
-            # Realizar operaciones relacionadas con el arranque de máquinas virtuales
-            s1.arrancar_mv()
-            s2.arrancar_mv()
-            s3.arrancar_mv()
+            # Arrancar los servidores
+            for i in range(num_servidores):
+                s = MV(f's{i + 1}')
+                s.arrancar_mv()
+                s.mostrar_consola_mv()
+            # Arrancar el resto de máquinas virtuales
             c1.arrancar_mv()
+            c1.mostrar_consola_mv()
             host.arrancar_mv()
+            host.mostrar_consola_mv()
             lb.arrancar_mv()
+            lb.mostrar_consola_mv()
             return
         else:
             nombre_mv = sys.argv[2]
             mv = MV(nombre_mv)
             mv.arrancar_mv()
+            mv.mostrar_consola_mv()
 
     elif orden == "parar":
         if len(sys.argv) < 3:
-            # Realizar operaciones relacionadas con el paro de máquinas virtuales
-            s1.parar_mv()
-            s2.parar_mv()
-            s3.parar_mv()
+            # Parar los servidores
+            for i in range(num_servidores):
+                s = MV(f's{i + 1}')
+                s.parar_mv()
+            # Parar el resto de máquinas virtuales
             c1.parar_mv()
             host.parar_mv()
             lb.parar_mv()
@@ -67,13 +89,15 @@ def main():
             mv.parar_mv()
 
     elif orden == "liberar":
-        # Realizar operaciones relacionadas con la liberación de recursos
-        s1.liberar_mv()
-        s2.liberar_mv()
-        s3.liberar_mv()
+        # Liberar los servidores
+        for i in range(num_servidores):
+            s = MV(f's{i + 1}')
+            s.liberar_mv()
+        # Liberar el resto de máquinas virtuales
         c1.liberar_mv()
         host.liberar_mv()
         lb.liberar_mv()
+        # Liberar la red
         red.liberar_red()
 
     elif orden == "monitor":
