@@ -149,7 +149,7 @@ class MV:
 
     # Configurar el balanceador de tráfico para que funcione como router al arrancar
     if self.nombre == 'lb':
-      subprocess.call(['sudo', 'virt-edit', '-a', 'lb.qcow2', '/etc/sysctl.conf', '-e', '"s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"'])
+      os.system('sudo virt-edit -a lb.qcow2 /etc/sysctl.conf -e "s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"')
     
     # Arrancar el gestor de máquinas virtuales para monitorizar su arranque
     os.environ['HOME']='/mnt/tmp'
