@@ -49,14 +49,15 @@ class MV:
       # Buscamos el nodo 'source' bajo 'interface' bajo 'devices' con nombre 'file', imprimimos su valor y lo cambiamos
       source_interface = root.find("./devices/interface/source")
       source_interface.set("bridge", interfaces_red)
-      # Guardar los cambios realizados
-      tree.write(self.nombre + '.xml')
+
+    # Guardar los cambios realizados
+    tree.write(self.nombre + '.xml')
 
   def arrancar_mv (self):
     log.debug("arrancar_mv " + self.nombre)
     # Crear los ficheros de configuración de cada máquina virtual en el host en un directorio temporal
     if self.nombre == 's1':
-      contenido = """
+      contenido_interfaces = """
         auto lo
         iface lo inet loopback
         
@@ -67,7 +68,7 @@ class MV:
           gateway 10.11.2.1
       """
     elif self.nombre == 's2':
-      contenido = """
+      contenido_interfaces = """
         auto lo
         iface lo inet loopback
         
@@ -78,7 +79,7 @@ class MV:
           gateway 10.11.2.1
       """
     elif self.nombre == 's3':
-      contenido = """
+      contenido_interfaces = """
         auto lo
         iface lo inet loopback
         
@@ -88,30 +89,52 @@ class MV:
           netmask 255.255.255.0
           gateway 10.11.2.1
       """
-    elif self.nombre == 'c1':
-      contenido = """
+    elif self.nombre == 's4':
+      contenido_interfaces = """
         auto lo
         iface lo inet loopback
         
-        auto eth1
+        auto eth0
+          iface eth0 inet static
+          address 10.11.2.34
+          netmask 255.255.255.0
+          gateway 10.11.2.1
+      """
+    elif self.nombre == 's5':
+      contenido_interfaces = """
+        auto lo
+        iface lo inet loopback
+        
+        auto eth0
+          iface eth0 inet static
+          address 10.11.2.35
+          netmask 255.255.255.0
+          gateway 10.11.2.1
+      """
+    elif self.nombre == 'c1':
+      contenido_interfaces = """
+        auto lo
+        iface lo inet loopback
+        
+        auto eth0
           iface eth0 inet static
           address 10.11.1.2
           netmask 255.255.255.0
           gateway 10.11.1.1
       """
     elif self.nombre == 'host':
-      contenido = """
+      contenido_interfaces = """
         auto lo
         iface lo inet loopback
         
-        auto eth1
+        auto eth0
           iface eth0 inet static
           address 10.11.1.3
           netmask 255.255.255.0
           gateway 10.11.1.1
       """
     elif self.nombre == 'lb':
-      contenido = """
+      contenido_interfaces = """
         auto lo
         iface lo inet loopback
         
@@ -121,18 +144,18 @@ class MV:
           netmask 255.255.255.0
         
         auto eth1
-          iface eth0 inet static
+          iface eth1 inet static
           address 10.11.2.1
           netmask 255.255.255.0
       """
-     
+
     # Directorio de trabajo actual
     directorio_trabajo = os.getcwd()
     # Ruta completa al archivo "interfaces"
     ruta_interfaces = os.path.join(directorio_trabajo, "interfaces")
     # Escribir el contenido sobre el archivo "interfaces"
     with open(ruta_interfaces, 'w') as interfaces:
-      interfaces.write(contenido)
+      interfaces.write(contenido_interfaces)
 
     # Ruta completa al archivo "hostname"
     ruta_hostname = os.path.join(directorio_trabajo, "hostname")
@@ -150,6 +173,54 @@ class MV:
     # Configurar el balanceador de tráfico para que funcione como router al arrancar
     if self.nombre == 'lb':
       os.system('sudo virt-edit -a lb.qcow2 /etc/sysctl.conf -e "s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/"')
+      # MEJORA OPCIONAL Nº2
+      # Ruta completa al archivo "haproxy.cfg"
+      ruta_haproxy = os.path.join(directorio_trabajo, "haproxy.cfg")
+      # Contenido a escribir en el "haproxy"
+      contenido_haproxy = """
+          frontend lb
+            bind *:80
+            mode http
+            default_backend webservers
+          backend webservers
+            mode http
+            balance roundrobin
+            server s1 10.11.2.31:80 check
+            server s2 10.11.2.32:80 check
+            server s3 10.11.2.33:80 check
+        """
+      # Escribir el contenido sobre el archivo "haproxy"
+      with open(ruta_haproxy, 'w') as haproxy:
+        haproxy.write(contenido_haproxy)
+      # Copiar el fichero de configuración al router lb
+      subprocess.call(['sudo', 'virt-copy-in', '-a', 'lb.qcow2', 'haproxy.cfg', '/etc/haproxy'])
+
+      # Ruta completa al archivo "rc.local"
+      ruta_rc = os.path.join(directorio_trabajo, "rc.local")
+      # Contenido a escribir en el "rc"
+      contenido_rc = """
+          #!/bin/she
+          #
+          # RC locales
+          #
+          # Este script se ejecuta al final de cada nivel de ejecución multiusuario.
+          # Asegúrese de que el script "saldrá de 0" en caso de éxito o lo que sea
+          # valor en caso de error.
+          #
+          # Para habilitar o deshabilitar este script, simplemente modifique la ejecución
+          # un poco.
+          #
+          # Por defecto, este script no hace nada.
+
+          service haproxy restart
+
+          exit 0
+        """
+      # Escribir el contenido sobre el archivo "rc"
+      with open(ruta_rc, 'w') as rc:
+        rc.write(contenido_rc)
+      # Copiar el fichero de configuración al router lb
+      subprocess.call(['sudo', 'virt-copy-in', '-a', 'lb.qcow2', 'rc.local', '/etc'])
     
     # Arrancar el gestor de máquinas virtuales para monitorizar su arranque
     os.environ['HOME']='/mnt/tmp'
@@ -158,12 +229,11 @@ class MV:
     subprocess.call(['sudo', 'virsh', 'define', f'{self.nombre}.xml'])
     subprocess.call(['sudo', 'virsh', 'start', f'{self.nombre}'])
 
-    log.debug("Se ha arrancado la máquina virtual")
-
   def mostrar_consola_mv (self):
     log.debug("mostrar_mv " + self.nombre)
     # Arrancar la consola de la máquina virtual
     subprocess.call([f"xterm -rv -sb -rightbar -fa monospace -fs 10 -title '{self.nombre}' -e 'sudo virsh console {self.nombre}' &"], shell=True)
+    #xterm -rv -sb -rightbar -fa monospace -fs 10 -title 's1' -e 'sudo virsh console s1' &
 
   def parar_mv (self):
     log.debug("parar_mv " + self.nombre)
