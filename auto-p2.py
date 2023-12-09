@@ -15,17 +15,10 @@ def pause():
     programPause = input("Press the <ENTER> key to continue...")
 
 def load_configuration():
-    # Cargar la configuración desde el archivo JSON
-    try:
-        with open('auto-p2.json') as config_file:
+    # Cargar la configuración desde auto-p2.json
+    with open('auto-p2.json') as config_file:
             config_data = json.load(config_file)
             return config_data["num_serv"]
-    except FileNotFoundError:
-        print("Archivo 'auto-p2.json' no encontrado. Asegúrate de que el archivo exista y tenga el formato correcto.")
-        sys.exit(1)
-    except json.JSONDecodeError:
-        print("Error al decodificar el archivo 'auto-p2.json'. Asegúrate de que el formato JSON sea correcto.")
-        sys.exit(1)
 
 def main():
     num_servidores = load_configuration()
