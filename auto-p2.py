@@ -1,3 +1,7 @@
+# GRUPO 27
+# Jaime Gallego Chillón
+# Marta Volpini López
+
 import logging, sys, subprocess, json
 from lib_mv import MV, Red
 
@@ -15,12 +19,13 @@ def pause():
     programPause = input("Press the <ENTER> key to continue...")
 
 def load_configuration():
-    # Cargar la configuración desde auto-p2.json
+    # Cargar el contenido de auto-p2.json
     with open('auto-p2.json') as config_file:
             config_data = json.load(config_file)
             return config_data["num_serv"]
 
 def main():
+    # Sacar el número de servidores del fichero auto-p2.json
     num_servidores = load_configuration()
         
     # Crear las clases de las MV
@@ -60,6 +65,7 @@ def main():
             lb.mostrar_consola_mv()
             return
         else:
+            # MEJORA OPCIONAL Nº4
             nombre_mv = sys.argv[2]
             mv = MV(nombre_mv)
             mv.arrancar_mv()
@@ -77,6 +83,7 @@ def main():
             lb.parar_mv()
             return
         else:
+            # MEJORA OPCIONAL Nº4
             nombre_mv = sys.argv[2]
             mv = MV(nombre_mv)
             mv.parar_mv()
@@ -93,6 +100,7 @@ def main():
         # Liberar la red
         red.liberar_red()
 
+    # MEJORA OPCIONAL Nº1
     elif orden == "monitor":
         # Monitorizar el estado de las máquinas virtuales
         subprocess.call(['sudo', 'virsh', 'list', '--all'])
